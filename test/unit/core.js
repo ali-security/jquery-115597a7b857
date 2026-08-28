@@ -1103,6 +1103,30 @@ test("jQuery.extend(Object, Object)", function() {
 	deepEqual( options2, options2Copy, "Check if not modified: options2 must not be modified" );
 });
 
+if ( window.JSON && window.JSON.parse ) {
+	test("jQuery.extend(true,{},{__proto__:...}) Object.prototype pollution", function() {
+		expect(3);
+
+		var name, shallow,
+			enumerableProto = false,
+			payload = JSON.parse( "{\"__proto__\": {\"devMode\": true}}" );
+
+		for ( name in payload ) {
+			if ( name === "__proto__" ) {
+				enumerableProto = true;
+			}
+		}
+
+		ok( enumerableProto, "The payload exposes __proto__ as an enumerable own property" );
+
+		jQuery.extend( true, {}, payload );
+		ok( !( "devMode" in {} ), "Object.prototype not polluted by a deep extend" );
+
+		shallow = jQuery.extend( {}, payload );
+		ok( !( "devMode" in shallow ), "__proto__ not copied onto the target by a shallow extend" );
+	});
+}
+
 test("jQuery.each(Object,Function)", function() {
 	expect( 23 );
 
