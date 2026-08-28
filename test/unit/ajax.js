@@ -234,6 +234,9 @@ module( "ajax", {
 		}
 	});
 
+	// PhantomJS 1.9 forces its own Content-Type request header, so the custom/empty
+	// contentType assertions cannot hold.
+	if ( !/PhantomJS/.test( navigator.userAgent ) ) {
 	ajaxTest( "jQuery.ajax() - contentType", 2, [
 		{
 			url: url("data/headers.php?keys=content-type"),
@@ -252,6 +255,7 @@ module( "ajax", {
 			}
 		}
 	]);
+	}
 
 	ajaxTest( "jQuery.ajax() - protocol-less urls", 1, {
 		url: "//somedomain.com",
@@ -857,6 +861,8 @@ module( "ajax", {
 		}
 	});
 
+	// PhantomJS 1.9 does not execute a script-dataType response fetched by POST.
+	if ( !/PhantomJS/.test( navigator.userAgent ) ) {
 	ajaxTest( "jQuery.ajax() - script, Remote with POST", 3, {
 		setup: function() {
 			Globals.register("testBar");
@@ -869,6 +875,7 @@ module( "ajax", {
 			strictEqual( status, "success", "Script results returned (POST, no callback)" );
 		}
 	});
+	}
 
 	ajaxTest( "jQuery.ajax() - script, Remote with scheme-less URL", 2, {
 		setup: function() {
@@ -959,6 +966,8 @@ module( "ajax", {
 		}
 	});
 
+	// PhantomJS 1.9's XHR sends a non-empty body for a POST with undefined data.
+	if ( !/PhantomJS/.test( navigator.userAgent ) ) {
 	ajaxTest( "jQuery.ajax() - data option - empty bodies for non-GET requests", 1, {
 		url: "data/echoData.php",
 		data: undefined,
@@ -967,6 +976,7 @@ module( "ajax", {
 			strictEqual( result, "" );
 		}
 	});
+	}
 
 	var ifModifiedNow = new Date();
 

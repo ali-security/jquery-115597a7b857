@@ -1,3 +1,18 @@
 language: node_js
 node_js:
 - '0.10'
+before_script:
+# The QUnit suite needs a PHP-serving host rooted at the repo (README:
+# "Running the Unit Tests") and a browser; PhantomJS is the only headless
+# engine of this jQuery era.
+- php --version || (sudo apt-get update -qq && sudo apt-get install -y -qq php-cli)
+- curl -sSL -o /tmp/phantomjs.tar.bz2 https://github.com/Medium/phantomjs/releases/download/v1.9.19/phantomjs-1.9.8-linux-x86_64.tar.bz2
+- tar -xjf /tmp/phantomjs.tar.bz2 -C /tmp
+- sudo ln -sf /tmp/phantomjs-1.9.8-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
+- phantomjs --version
+- php -S 127.0.0.1:8000 -t "$PWD" > /tmp/php-server.log 2>&1 &
+- sleep 3
+- curl -sSf -o /dev/null http://127.0.0.1:8000/test/index.html
+script:
+- npm test
+- phantomjs test/phantom-runner.js http://127.0.0.1:8000/test/index.html
